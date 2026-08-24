@@ -43,6 +43,10 @@ no CORS configuration to deal with.
 
 ## How it works
 
+
+
+## for reference  "Multi-hop questions requiring synthesis across chunks can produce plausible but incorrect answers
+becuase of which switching to RetrievalAugmentedGeneration is necessary 
 ```
 PDF upload
    ↓  PagePdfDocumentReader          one Document per page
