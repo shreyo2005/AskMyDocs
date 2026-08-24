@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AskMyDocs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+
+        :root{
+            --bg:#faf8f5;
+            --surface:#ffffff;
+            --ink:#1c1815;
+            --muted:#6f665e;
+            --faint:#a39a91;
+            --line:#e8e1d9;
+            --accent:#a05c34;
+            --accent-soft:#f6ede6;
+            --accent-ink:#7d4526;
+            --shadow:0 1px 2px rgba(28,24,21,.04),0 8px 24px rgba(28,24,21,.04);
+        }
+
+        [data-theme="dark"]{
+            --bg:#17181a;
+            --surface:#1e2023;
+            --ink:#eceae7;
+            --muted:#9a958f;
+            --faint:#6b6660;
+            --line:#2c2f33;
+            --accent:#c4805a;
+            --accent-soft:#26211d;
+            --accent-ink:#d99a75;
+            --shadow:0 1px 2px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.18);
+        }
+
+        body{
+            font-family:Inter,-apple-system,"Segoe UI",sans-serif;
+            background:var(--bg);color:var(--ink);
+            line-height:1.6;-webkit-font-smoothing:antialiased;
+            transition:background .25s,color .25s;
+        }
+        .mono{font-family:"JetBrains Mono",Consolas,monospace}
+        .wrap{max-width:780px;margin:0 auto;padding:44px 24px 90px}
+
+        /* ---------- masthead ---------- */
+        .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:34px}
+        h1{font-family:Fraunces,Georgia,serif;font-size:30px;font-weight:600;letter-spacing:-.02em}
+        h1 span{color:var(--accent)}
+        .tag{font-size:13.5px;color:var(--muted);margin-top:2px}
+
+        .toggle{
+            display:flex;align-items:center;gap:7px;cursor:pointer;
+            font-size:12px;color:var(--muted);
+            background:var(--surface);border:1px solid var(--line);
+            border-radius:100px;padding:7px 13px;font-family:inherit;
+            transition:border-color .15s;
+        }
+        .toggle:hover{border-color:var(--accent)}
+        .toggle svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+        /* ---------- notice ---------- */
+        .notice{
+            font-size:12.5px;color:var(--muted);
+            background:var(--accent-soft);border:1px solid var(--line);
+            border-left:2px solid var(--accent);
+            border-radius:4px;padding:10px 14px;margin-bottom:26px;
+        }
+
+        /* ---------- panels ---------- */
+        .panel{
+            background:var(--surface);border:1px solid var(--line);
+            border-radius:8px;padding:24px;margin-bottom:18px;
+            box-shadow:var(--shadow);transition:background .25s,border-color .25s;
+        }
+        .panel-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+        h2{font-family:Fraunces,Georgia,serif;font-size:17px;font-weight:600}
+        .step{font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--faint)}
+
+        /* ---------- dropzone ---------- */
+        .drop{
+            border:1.5px dashed var(--line);border-radius:6px;
+            padding:32px 20px;text-align:center;cursor:pointer;
+            transition:border-color .15s,background .15s;
+        }
+        .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+        .drop strong{font-weight:600}
+        .drop p{font-size:14px;color:var(--ink)}
+        .drop small{font-size:12px;color:var(--faint)}
+        input[type=file]{display:none}
+        .fname{font-size:13px;margin-top:12px;color:var(--muted)}
+
+        /* ---------- controls ---------- */
+        button{
+            font-family:inherit;font-size:13.5px;font-weight:500;
+            padding:9px 18px;margin-top:14px;cursor:pointer;
+            background:var(--accent);color:#fff;border:none;border-radius:5px;
+            transition:opacity .15s;
+        }
+        button:hover{opacity:.88}
+        button:disabled{background:var(--faint);cursor:not-allowed;opacity:1}
+        button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+        button.ghost:hover{border-color:var(--accent);color:var(--accent);opacity:1}
+
+        input[type=text],select{
+            width:100%;font-family:inherit;font-size:14px;padding:11px 13px;
+            background:var(--bg);color:var(--ink);
+            border:1px solid var(--line);border-radius:5px;margin-bottom:10px;
+        }
+        input[type=text]:focus,select:focus{outline:none;border-color:var(--accent)}
+        input[type=text]::placeholder{color:var(--faint)}
+        label.small{display:block;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+
+        /* ---------- output ---------- */
+        .out{
+            margin-top:15px;padding:16px 18px;font-size:14px;
+            background:var(--bg);border:1px solid var(--line);
+            border-radius:6px;white-space:pre-wrap;line-height:1.65;
+        }
+        .out.err{border-color:#c0392b;color:#c0392b}
+        .out.busy{color:var(--muted);font-style:italic}
+
+        .sources{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+        .sources h3{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+        .sources div{font-size:12px;color:var(--muted);padding:7px 0;border-bottom:1px solid var(--line)}
+        .sources div:last-child{border-bottom:none}
+        .sources b{color:var(--accent-ink);font-family:"JetBrains Mono",monospace;font-size:11.5px}
+
+        .foot{text-align:center;font-size:11.5px;color:var(--faint);margin-top:34px}
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="top">
+        <div>
+            <h1>Ask<span>My</span>Docs</h1>
+            <p class="tag">Upload a PDF. Ask it anything. Everything runs on your machine.</p>
+        </div>
+        <button class="toggle" id="themeBtn" type="button">
+            <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+            <span id="themeLabel">Dark</span>
+        </button>
+    </div>
+
+    <p class="notice">Runs locally with Ollama — no API keys, nothing leaves your machine. Embedding a large PDF takes a minute or two.</p>
+
+    <div class="panel">
+        <div class="panel-head"><h2>Upload a document</h2><span class="step">01</span></div>
+        <div class="drop" id="drop">
+            <p><strong>Choose a PDF</strong> or drag one here</p>
+            <small>Up to 20 MB</small>
+        </div>
+        <input type="file" id="file" accept="application/pdf" />
+        <p class="fname mono" id="fname"></p>
+        <button id="upBtn" disabled>Upload and index</button>
+        <div class="out" id="upOut" hidden></div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head"><h2>Ask a question</h2><span class="step">02</span></div>
+        <label class="small">Search within</label>
+        <select id="docSel"><option value="">All documents</option></select>
+        <input type="text" id="q" placeholder="What does this document say about…" />
+        <button id="askBtn">Ask</button>
+        <div class="out" id="askOut" hidden></div>
+        <div class="sources" id="srcBox" hidden><h3>Retrieved from</h3><div id="srcList"></div></div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head"><h2>Summarise</h2><span class="step">03</span></div>
+        <label class="small">Document</label>
+        <select id="sumSel"><option value="">Select a document</option></select>
+        <button id="sumBtn" class="ghost">Generate summary</button>
+        <div class="out" id="sumOut" hidden></div>
+    </div>
+
+    <p class="foot">Spring Boot · Spring AI · pgvector · Ollama</p>
+</div>
+
+<script>
+    const $ = id => document.getElementById(id);
+
+    /* ---------- theme ---------- */
+    const MOON = "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z";
+    const SUN  = "M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4";
+    let theme = "light";
+
+    function applyTheme(t) {
+        theme = t;
+        document.documentElement.setAttribute("data-theme", t);
+        $("themeIcon").innerHTML = `<path d="${t === "light" ? MOON : SUN}"/>`;
+        $("themeLabel").textContent = t === "light" ? "Dark" : "Light";
+    }
+    $("themeBtn").onclick = () => applyTheme(theme === "light" ? "dark" : "light");
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) applyTheme("dark");
+
+    /* ---------- upload ---------- */
+    let chosen = null;
+
+    $("drop").onclick = () => $("file").click();
+    $("drop").ondragover = e => { e.preventDefault(); $("drop").classList.add("over"); };
+    $("drop").ondragleave = () => $("drop").classList.remove("over");
+    $("drop").ondrop = e => {
+        e.preventDefault(); $("drop").classList.remove("over");
+        if (e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]);
+    };
+    $("file").onchange = () => { if ($("file").files.length) setFile($("file").files[0]); };
+
+    function setFile(f) {
+        chosen = f;
+        $("fname").textContent = `${f.name} · ${(f.size/1048576).toFixed(2)} MB`;
+        $("upBtn").disabled = false;
+        $("upOut").hidden = true;
+    }
+
+    function show(el, text, cls) {
+        el.hidden = false; el.textContent = text;
+        el.className = "out" + (cls ? " " + cls : "");
+    }
+
+    async function refreshDocs() {
+        try {
+            const docs = await (await fetch("/api/documents")).json();
+            for (const sel of [$("docSel"), $("sumSel")]) {
+                const first = sel.options[0].outerHTML;
+                sel.innerHTML = first + docs.map(d =>
+                    `<option value="${d.documentId}">${d.filename}</option>`).join("");
+            }
+        } catch (e) {}
+    }
+    refreshDocs();
+
+    $("upBtn").onclick = async () => {
+        if (!chosen) return;
+        const body = new FormData();
+        body.append("file", chosen);
+        $("upBtn").disabled = true;
+        show($("upOut"), "Extracting text and generating embeddings… this can take a minute.", "busy");
+        try {
+            const r = await fetch("/api/documents/upload", { method: "POST", body });
+            const d = await r.json();
+            if (d.ok) {
+                show($("upOut"), `Indexed ${d.filename}\n${d.pages} pages · ${d.chunks} chunks · ${d.characters.toLocaleString()} characters`);
+                refreshDocs();
+            } else show($("upOut"), d.error, "err");
+        } catch (e) { show($("upOut"), "Upload failed: " + e.message, "err"); }
+        finally { $("upBtn").disabled = false; }
+    };
+
+    /* ---------- ask ---------- */
+    $("askBtn").onclick = async () => {
+        const q = $("q").value.trim();
+        if (!q) return;
+        $("askBtn").disabled = true;
+        $("srcBox").hidden = true;
+        show($("askOut"), "Searching your documents…", "busy");
+        try {
+            let url = "/api/documents/ask?question=" + encodeURIComponent(q);
+            if ($("docSel").value) url += "&documentId=" + $("docSel").value;
+            const d = await (await fetch(url)).json();
+            if (d.ok) {
+                show($("askOut"), d.answer);
+                $("srcList").innerHTML = d.sources.map(s =>
+                    `<div><b>${s.filename} · p.${s.page}</b><br>${s.excerpt}</div>`).join("");
+                $("srcBox").hidden = false;
+            } else show($("askOut"), d.error, "err");
+        } catch (e) { show($("askOut"), "Request failed: " + e.message, "err"); }
+        finally { $("askBtn").disabled = false; }
+    };
+    $("q").onkeydown = e => { if (e.key === "Enter") $("askBtn").click(); };
+
+    /* ---------- summarise ---------- */
+    $("sumBtn").onclick = async () => {
+        const id = $("sumSel").value;
+        if (!id) { show($("sumOut"), "Select a document first.", "err"); return; }
+        $("sumBtn").disabled = true;
+        show($("sumOut"), "Summarising section by section — this takes a while on a local model.", "busy");
+        try {
+            const d = await (await fetch("/api/documents/summarize?documentId=" + id)).json();
+            if (d.ok) show($("sumOut"), d.summary);
+            else show($("sumOut"), d.error, "err");
+        } catch (e) { show($("sumOut"), "Request failed: " + e.message, "err"); }
+        finally { $("sumBtn").disabled = false; }
+    };
+</script>
+</body>
+</html>

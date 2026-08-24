@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: askmydocs-postgres
+    environment:
+      POSTGRES_DB: askmydocs
+      POSTGRES_USER: askmydocs
+      POSTGRES_PASSWORD: askmydocs
+    ports:
+      - "5433:5432"
+    volumes:
+      - askmydocs-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U askmydocs -d askmydocs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  askmydocs-pgdata:
